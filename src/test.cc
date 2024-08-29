@@ -1,12 +1,7 @@
-#include "lib.cc"
+#include "str.cc"
 
-
-
-auto main() -> int {
-    using namespace coding;
-    using namespace ops;
-    auto x = Box(new i64(-39i64));
-    auto const _ = &x;
-    std::cout << *x << std::endl;
+auto main(int argc, char const* const* argv) -> int {
+    str a = argv[1];
+    for (auto i : a.split(argv[2])) std::cout << "'" << &i << "'" << std::endl;
     return 0;
 }

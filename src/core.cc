@@ -2,6 +2,25 @@
 
 #include <cstdint>
 #include <utility>
+#include <functional>
+
+#define unit unit
+
+/// @brief The unit type.
+/// @note Unfortunately due to some C++ features this will take up one byte.
+/// 
+struct unit {
+
+    /// @brief Construct a unit type.
+    /// 
+    inline constexpr unit() noexcept {}
+
+    /// @brief Every `unit` is equal.
+    /// @param rhs the right-hand side
+    /// @return always be `true`
+    /// 
+    inline constexpr auto operator==(unit const& rhs) const noexcept -> bool { return true; }
+};
 
 typedef ::std::intptr_t isize;
 typedef ::std::uintptr_t usize;
@@ -19,16 +38,16 @@ typedef ::std::uint64_t u64;
 #pragma GCC diagnostic ignored "-Wliteral-suffix"
 #endif
 
-constexpr auto operator"" usize(unsigned long long x) noexcept -> usize { return (usize) x; };
-constexpr auto operator"" isize(unsigned long long x) noexcept -> isize { return (isize) x; };
-constexpr auto operator"" i8(unsigned long long x) noexcept -> i8 { return (i8) x; };
-constexpr auto operator"" i16(unsigned long long x) noexcept -> i16 { return (i16) x; };
-constexpr auto operator"" i32(unsigned long long x) noexcept -> i32 { return (i32) x; };
-constexpr auto operator"" i64(unsigned long long x) noexcept -> i64 { return (i64) x; };
-constexpr auto operator"" u8(unsigned long long x) noexcept -> u8 { return (u8) x; };
-constexpr auto operator"" u16(unsigned long long x) noexcept -> u16 { return (u16) x; };
-constexpr auto operator"" u32(unsigned long long x) noexcept -> u32 { return (u32) x; };
-constexpr auto operator"" u64(unsigned long long x) noexcept -> u64 { return (u64) x; };
+inline constexpr auto operator"" usize(unsigned long long x) noexcept -> usize { return (usize) x; };
+inline constexpr auto operator"" isize(unsigned long long x) noexcept -> isize { return (isize) x; };
+inline constexpr auto operator"" i8(unsigned long long x) noexcept -> i8 { return (i8) x; };
+inline constexpr auto operator"" i16(unsigned long long x) noexcept -> i16 { return (i16) x; };
+inline constexpr auto operator"" i32(unsigned long long x) noexcept -> i32 { return (i32) x; };
+inline constexpr auto operator"" i64(unsigned long long x) noexcept -> i64 { return (i64) x; };
+inline constexpr auto operator"" u8(unsigned long long x) noexcept -> u8 { return (u8) x; };
+inline constexpr auto operator"" u16(unsigned long long x) noexcept -> u16 { return (u16) x; };
+inline constexpr auto operator"" u32(unsigned long long x) noexcept -> u32 { return (u32) x; };
+inline constexpr auto operator"" u64(unsigned long long x) noexcept -> u64 { return (u64) x; };
 
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
@@ -52,23 +71,30 @@ typedef __uint128_t u128;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wliteral-suffix"
-constexpr auto operator"" i128(unsigned long long x) noexcept -> i128 { return (i128) x; };
-constexpr auto operator"" u128(unsigned long long x) noexcept -> u128 { return (u128) x; };
+inline constexpr auto operator"" i128(unsigned long long x) noexcept -> i128 { return (i128) x; };
+inline constexpr auto operator"" u128(unsigned long long x) noexcept -> u128 { return (u128) x; };
 #pragma GCC diagnostic pop
 
 #define i128 i128
 #define u128 u128
 #endif
 
-/**
- * @brief The same as `std::move` in `<utility>`. This is here to avoid naming conflict with `std::move` in `<algorithm>`.
- *
- * @warning Use of value after move is undefined.
- *
- * @tparam T
- * @param x value
- * @return rvalue reference
- */
-template<typename T> constexpr auto mv(T&& x) noexcept -> typename ::std::remove_reference<T>::type&& {
-    return static_cast<typename ::std::remove_reference<T>::type&&>(x);
+/// @brief Move the ownership of a certain variable.
+/// 
+#define mv mv
+
+/// @brief The same as `std::move` in `<utility>`. This is here to avoid naming conflict with `std::move` in `<algorithm>`.
+/// @warning Use of value after move is undefined.
+/// @tparam T
+/// @param src value
+/// @return rvalue reference
+/// 
+template<typename T> inline constexpr auto mv(T&& src) noexcept -> typename ::std::remove_reference<T>::type&& {
+    return static_cast<typename ::std::remove_reference<T>::type&&>(src);
 }
+
+/// @brief Infinite loop.
+/// 
+#define loop for (;;)
+
+#define Fn(signature) ::std::function<signature>
