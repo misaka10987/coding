@@ -7,6 +7,8 @@
 
 namespace coding {
 
+    // This is put directly into the `coding` namespace for the sake of type inference.
+
     /// @brief A generic pointer with unique ownership.
     /// @tparam T the type pointing to
     /// 
@@ -63,6 +65,6 @@ namespace coding {
 /// 
 namespace coding::ptr {
     
-    template <typename T> using Rc = ::std::shared_ptr<T>;
+    template <typename T> using Rc = std::shared_ptr<T>;
 }
 

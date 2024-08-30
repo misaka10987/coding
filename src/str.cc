@@ -1,10 +1,10 @@
 #pragma once
-#include <cstring>
 
 #include "root.cc"
 #include "core.cc"
 #include "thread.cc"
 
+#include <cstring>
 #include <cstdlib>
 #include <vector>
 
@@ -214,90 +214,93 @@ public:
 
 };
 
-/// @brief An owned string type.
-/// 
-class String final {
+namespace coding {
 
-private:
-
-    /// @brief Internal storage.
+    /// @brief An owned string type.
     /// 
-    std::vector<char> data;
+    class String final {
 
-public:
+    private:
 
-    inline constexpr String(char const* c_str) noexcept :data(std::vector(c_str, c_str + (usize) std::strlen(c_str))) {}
+        /// @brief Internal storage.
+        /// 
+        std::vector<char> data;
 
-    inline constexpr String(str s) noexcept :data(std::vector(s.head, s.tail())) {}
+    public:
 
-    inline constexpr auto operator=(char const* c_str) noexcept {
-        this->data.assign(c_str, c_str + (usize) std::strlen(c_str));
-    }
+        inline constexpr String(char const* c_str) noexcept :data(std::vector(c_str, c_str + (usize) std::strlen(c_str))) {}
 
-    inline constexpr auto operator=(str s) noexcept {
-        this->data.assign(s.head, s.tail());
-    }
+        inline constexpr String(str s) noexcept :data(std::vector(s.head, s.tail())) {}
 
-    inline constexpr auto len() const noexcept -> usize {
-        return this->data.size();
-    }
+        inline constexpr auto operator=(char const* c_str) noexcept {
+            this->data.assign(c_str, c_str + (usize) std::strlen(c_str));
+        }
 
-    inline constexpr auto operator*() const noexcept -> str {
-        return str(this->data.data(), this->data.size());
-    }
+        inline constexpr auto operator=(str s) noexcept {
+            this->data.assign(s.head, s.tail());
+        }
 
-    inline constexpr operator str() const noexcept {
-        return **this;
-    }
+        inline constexpr auto len() const noexcept -> usize {
+            return this->data.size();
+        }
 
-    inline constexpr auto operator&() const noexcept -> std::string_view {
-        return &**this;
-    }
+        inline constexpr auto operator*() const noexcept -> str {
+            return str(this->data.data(), this->data.size());
+        }
 
-    /// @brief Index the string.
-    /// @param idx the index
-    /// @return the `idx`th char
-    /// 
-    /// # Panic
-    /// 
-    /// Panic if the index is out of bound.
-    /// 
-    inline constexpr auto operator[](usize idx) const noexcept -> char const& {
-        if (idx > this->data.size()) coding::panic("index out of bound");
-        return this->data[idx];
-    }
+        inline constexpr operator str() const noexcept {
+            return **this;
+        }
 
-    /// @brief Index the string.
-    /// @param idx the index
-    /// @return the `idx`th char
-    /// 
-    /// # Panic
-    /// 
-    /// Panic if the index is out of bound.
-    /// 
-    inline constexpr auto operator[](usize idx) noexcept -> char& {
-        if (idx > this->data.size()) coding::panic("index out of bound");
-        return this->data[idx];
-    }
+        inline constexpr auto operator&() const noexcept -> std::string_view {
+            return &**this;
+        }
 
-    /// @brief Same as `.operator[]` but does not perform boundary check.
-    /// @param idx the index
-    /// @return the `idx`th char
-    /// 
-    inline constexpr auto index_unchecked(usize idx) const noexcept -> char const& {
-        return this->data[idx];
-    }
+        /// @brief Index the string.
+        /// @param idx the index
+        /// @return the `idx`th char
+        /// 
+        /// # Panic
+        /// 
+        /// Panic if the index is out of bound.
+        /// 
+        inline constexpr auto operator[](usize idx) const noexcept -> char const& {
+            if (idx > this->data.size()) coding::panic("index out of bound");
+            return this->data[idx];
+        }
 
-    inline constexpr auto operator+=(String const& rhs) noexcept {
-        this->data.insert(this->data.end(), rhs.data.begin(), rhs.data.end());
-    }
+        /// @brief Index the string.
+        /// @param idx the index
+        /// @return the `idx`th char
+        /// 
+        /// # Panic
+        /// 
+        /// Panic if the index is out of bound.
+        /// 
+        inline constexpr auto operator[](usize idx) noexcept -> char& {
+            if (idx > this->data.size()) coding::panic("index out of bound");
+            return this->data[idx];
+        }
 
-    inline constexpr auto operator+(String const& rhs) noexcept {
-        auto ans = rhs;
-        ans += rhs;
-        return ans;
-    }
+        /// @brief Same as `.operator[]` but does not perform boundary check.
+        /// @param idx the index
+        /// @return the `idx`th char
+        /// 
+        inline constexpr auto index_unchecked(usize idx) const noexcept -> char const& {
+            return this->data[idx];
+        }
 
-};
+        inline constexpr auto operator+=(String const& rhs) noexcept {
+            this->data.insert(this->data.end(), rhs.data.begin(), rhs.data.end());
+        }
+
+        inline constexpr auto operator+(String const& rhs) noexcept {
+            auto ans = *this;
+            ans += rhs;
+            return ans;
+        }
+
+    };
+}
 
 inline constexpr auto operator"" _str(char const* s, usize len) noexcept -> str { return str(s, len); };

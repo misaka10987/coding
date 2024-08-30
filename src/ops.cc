@@ -13,10 +13,11 @@ namespace coding::ops {
     /// To further constrain the type, use `Eq`.
     /// @tparam Self the type itself
     /// 
-    template<typename Self> concept PartialEq
+    template<typename Self>
+    concept PartialEq
         = requires(Self const& a, Self const& rhs) {
-            { a == rhs } -> ::std::same_as<bool>;
-            { a != rhs } -> ::std::same_as<bool>;
+            { a == rhs } -> std::same_as<bool>;
+            { a != rhs } -> std::same_as<bool>;
     };
 
     /// @brief a type to properly implement `==` and `!=` (equality operator).
@@ -32,7 +33,7 @@ namespace coding::ops {
     /// 
     /// - transitive: `a == b` and `b == c` implies `a == c`.
     /// 
-    template<typename Self> concept Eq = PartialEq<Self> && ::std::equality_comparable<Self const&>;
+    template<typename Self> concept Eq = PartialEq<Self> && std::equality_comparable<Self const&>;
 
     /// @brief Require a type to overload `<`, `<=`, `==`, `>=` and `>` (comparision operator).
     /// @note `PartialOrd` does not provide any guarantee about whether the operators are properly implemented.
@@ -41,23 +42,24 @@ namespace coding::ops {
     /// 
     template<typename Self> concept PartialOrd
         = requires(Self const& a, Self const& rhs) {
-            { a < rhs } -> ::std::same_as<bool>;
-            { a <= rhs } -> ::std::same_as<bool>;
-            { a == rhs } -> ::std::same_as<bool>;
-            { a >= rhs } -> ::std::same_as<bool>;
-            { a > rhs } -> ::std::same_as<bool>;
+            { a < rhs } -> std::same_as<bool>;
+            { a <= rhs } -> std::same_as<bool>;
+            { a == rhs } -> std::same_as<bool>;
+            { a >= rhs } -> std::same_as<bool>;
+            { a > rhs } -> std::same_as<bool>;
     };
 
-    template<typename Self> concept Ord = PartialOrd<Self> && ::std::totally_ordered<Self const&>;
+    template<typename Self> concept Ord = PartialOrd<Self> && std::totally_ordered<Self const&>;
 
     /// @brief Require a type to overload `+` (addition operator).
     /// @tparam Self the type itself
     /// @tparam Other the right-hand side
     /// @tparam Output the result of operation
     /// 
-    template<typename Self, typename Other = Self, typename Output = Self> concept Add
+    template<typename Self, typename Other = Self, typename Output = Self>
+    concept Add
         = requires(Self a, Other rhs) {
-            { a + rhs } -> ::std::same_as<Output>;
+            { a + rhs } -> std::same_as<Output>;
     };
 
     /// @brief Require a type to overload `-` (subtraction operator).
@@ -65,9 +67,10 @@ namespace coding::ops {
     /// @tparam Other the right-hand side
     /// @tparam Output the result of operation
     /// 
-    template<typename Self, typename Other = Self, typename Output = Self> concept Sub
+    template<typename Self, typename Other = Self, typename Output = Self>
+    concept Sub
         = requires(Self a, Other rhs) {
-            { a - rhs } -> ::std::same_as<Output>;
+            { a - rhs } -> std::same_as<Output>;
     };
 
     /// @brief Require a type to overload `*` (multiplication operator).
@@ -75,9 +78,10 @@ namespace coding::ops {
     /// @tparam Other the right-hand side
     /// @tparam Output the result of operation
     /// 
-    template<typename Self, typename Other = Self, typename Output = Self> concept Mul
+    template<typename Self, typename Other = Self, typename Output = Self>
+    concept Mul
         = requires(Self a, Other rhs) {
-            { a* rhs } -> ::std::same_as<Output>;
+            { a* rhs } -> std::same_as<Output>;
     };
 
     /// @brief Require a type to overload `/` (division operator).
@@ -85,9 +89,10 @@ namespace coding::ops {
     /// @tparam Other the right-hand side
     /// @tparam Output the result of operation
     /// 
-    template<typename Self, typename Other = Self, typename Output = Self> concept Div
+    template<typename Self, typename Other = Self, typename Output = Self>
+    concept Div
         = requires(Self a, Other rhs) {
-            { a / rhs } -> ::std::same_as<Output>;
+            { a / rhs } -> std::same_as<Output>;
     };
 
 }
