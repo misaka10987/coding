@@ -9,6 +9,10 @@ auto f(Result<String, String> a) -> Result<String, String> {
 }
 
 auto main() -> int {
+    auto a = Option(1);
+    auto b = Option<int>();
+    auto c = a.map<int>([](auto x) {return x + 1; });
+    debug(c.unwrap());
     info("hi");
     return 0;
 }

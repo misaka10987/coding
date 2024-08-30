@@ -4,6 +4,8 @@
 #include "core.cc"
 #include "thread.cc"
 
+#include <variant>
+
 namespace coding::option {
 
     /// @brief Tag for the `Option` to `switch` on.
@@ -29,29 +31,21 @@ namespace coding {
     /// @tparam T the type when `Some`.
     ///
     template<typename T>
-    class Option final{
+    class Option final {
 
     private:
 
-        union Inner {
-            T Some;
-            unit None;
-            ~Inner() {}
-        };
+        struct _None {};
 
         option::Tag tag : 1;
 
-        Inner value;
+        std::variant < T, _None> value;
 
     public:
 
-        ~Option() {
-            if (this->is_some()) this->value.Some.~T();
-        }
-
         /// @brief Construct a `None` value.
         ///
-        inline constexpr Option() noexcept : tag(None) {}
+        inline constexpr Option() noexcept : tag(None), value(_None()) {}
 
         /// @brief Construct a `Some` value.
         /// @param value the value with
@@ -87,7 +81,7 @@ namespace coding {
         ///
         inline auto unwrap() const&& noexcept -> T {
             if (this->is_none()) panic("unwrap on `None` value");
-            return this->value.Some;
+            return std::get<T>(this->value);
         }
 
         /// @brief Unwrap the `Option` to a `Some` value.
@@ -99,7 +93,7 @@ namespace coding {
         ///
         inline auto unwrap() const& noexcept -> T const& {
             if (this->is_none()) panic("unwrap on `None` value");
-            return this->value.Some;
+            return std::get<T>(this->value);
         }
 
         /// @brief Unwrap the `Option` to a `Some` value.
@@ -111,15 +105,19 @@ namespace coding {
         ///
         inline auto unwrap() & noexcept -> T& {
             if (this->is_none()) panic("unwrap on `None` value");
-            return this->value.Some;
+            return std::get<T>(this->value);
         }
 
-        // TODO
-        // template<typename U>
-        // inline auto map(U* mapping(T const&)) -> Option<U> {
-        //     if(this->is_none()) return Option();
-        //     auto res = mapping(this->unwrap());
-        //     return Option(mv(res));
-        // }
+        /// @brief Maps the `Some` value if it is, otherwise return a `None`.
+        /// @tparam U the type mapped to
+        /// @param mapping the mapping function to call
+        /// @return the mapped new `Option`
+        /// 
+        template<typename U>
+        inline constexpr auto map(Fn(U(T const&)) mapping) const& noexcept -> Option<U> {
+            if (this->is_none()) return Option();
+            auto some = mapping(std::get<T>(this->value));
+            return Option(some);
+        }
     };
 }
