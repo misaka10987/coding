@@ -12,7 +12,7 @@ namespace coding::thread {
     /// @param msg message to print to `stderr`
     /// @return never
     /// 
-    auto panic(char const* msg = "") noexcept {
+    auto panic(std::string_view msg = "") noexcept {
         auto id = ::std::this_thread::get_id();
         ::std::cerr
             << msg << ::std::endl

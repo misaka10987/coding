@@ -1,12 +1,12 @@
 #pragma once
+#include <cstring>
 
+#include "root.cc"
 #include "core.cc"
 #include "thread.cc"
 
-#include <cstring>
 #include <cstdlib>
-
-#include<thread>
+#include <vector>
 
 #define str str
 
@@ -32,14 +32,13 @@ public:
     /// 
     inline constexpr str(char const* head, usize len) noexcept :head(head), len(len) {}
 
-
     /// @brief Construct from c-style string. This calculates the length and clones.
     /// @param c_str c-style NULL-ending string
     /// @return new `str`
     /// 
-    inline str(char const* c_str) noexcept : head(c_str), len(::std::strlen(c_str)) {}
+    inline str(char const* c_str) noexcept : head(c_str), len(std::strlen(c_str)) {}
 
-    inline constexpr str(::std::string_view str_view) noexcept : head(str_view.begin()), len(str_view.length()) {}
+    inline constexpr str(std::string_view str_view) noexcept : head(str_view.begin()), len(str_view.length()) {}
 
     /// @brief Get the tail position of the string, i.e. this always points to the ending `NULL`.
     /// @return the pointer to tail
@@ -51,8 +50,8 @@ public:
     /// @brief Borrow a `std::string_view` from the current instance.
     /// @return `std::string_view`, of the same lifespan
     /// 
-    inline constexpr auto operator&() const noexcept -> ::std::string_view {
-        return ::std::string_view(this->head, this->len);
+    inline constexpr auto operator&() const noexcept -> std::string_view {
+        return std::string_view(this->head, this->len);
     }
 
     /// @brief Index the string.
@@ -62,6 +61,7 @@ public:
     /// # Panic
     /// 
     /// Panic if the index is out of bound.
+    /// 
     inline auto operator[](usize idx) const noexcept -> char {
         if (idx > this->len) coding::panic("index out of bound");
         return this->index_unchecked(idx);
@@ -125,13 +125,13 @@ public:
 
     private:
 
-        /// @brief The head of (sub)string to split on.
+        /// @brief The (sub)string to split on.
         /// 
-        ::std::string_view s;
+        std::string_view s;
 
         /// @brief The pattern to split with.
         /// 
-        ::std::string_view pat;
+        std::string_view pat;
 
     public:
 
@@ -145,18 +145,18 @@ public:
 
         private:
 
-            /// @brief The string to split on.
+            /// @brief The (sub)string to split on.
             /// 
-            ::std::string_view s;
+            std::string_view s;
 
             /// @brief The pattern to split with.
             /// 
-            ::std::string_view pat;
+            std::string_view pat;
 
             usize next = 0;
         public:
 
-            inline constexpr Iterator(::std::string_view s, ::std::string_view pat) noexcept : s(s), pat(pat) {}
+            inline constexpr Iterator(std::string_view s, std::string_view pat) noexcept : s(s), pat(pat) {}
 
             inline constexpr auto operator++() noexcept {
                 this->s = this->s.substr(this->next);
@@ -168,7 +168,7 @@ public:
 
             inline auto operator*() noexcept -> str {
                 auto p = this->s.find(this->pat);
-                if (p == ::std::string_view::npos) {
+                if (p == std::string_view::npos) {
                     this->next = this->s.length();
                     return str(this->s);
                 }
@@ -201,6 +201,7 @@ public:
         inline constexpr auto end() const noexcept -> Iterator {
             return Iterator(this->s, this->pat);
         }
+
     };
 
     /// @brief Split the string on specified pattern.
@@ -210,6 +211,7 @@ public:
     inline constexpr auto split(str pat) const noexcept -> Split {
         return Split(*this, pat);
     }
+
 };
 
 /// @brief An owned string type.
@@ -218,124 +220,84 @@ class String final {
 
 private:
 
-    /// @brief Head of the string, i.e. points to the first byte like a c-styled string.
+    /// @brief Internal storage.
     /// 
-    char* head;
-
-    /// @brief Length of the string excluding the tailing `NULL`.
-    /// 
-    usize length;
-
-    /// @brief Current capacity of the string container in bytes.
-    /// 
-    usize cap;
-
-    /// @brief Get the tail position of the string, i.e. this always points to the ending `NULL`.
-    /// @return the pointer to tail
-    /// 
-    inline constexpr auto tail() noexcept -> char* {
-        return this->head + this->len();
-    }
-
-    /// @brief Reallocate the string with specified capacity, preserving content.
-    /// @param new_cap new capacity
-    /// @return 
-    /// 
-    inline auto realloc(usize new_cap) noexcept {
-        this->cap = new_cap == 0 ? 1 : new_cap;
-        auto p = ::std::realloc((void*) this->head, this->cap);
-        this->head = (char*) p;
-    }
+    std::vector<char> data;
 
 public:
 
-    ~String() {
-        if (this->head) std::cerr << "free" << std::endl;
-        else std::cerr << "free nullptr" << std::endl;
-        ::std::free((void*) this->head);
+    inline constexpr String(char const* c_str) noexcept :data(std::vector(c_str, c_str + (usize) std::strlen(c_str))) {}
+
+    inline constexpr String(str s) noexcept :data(std::vector(s.head, s.tail())) {}
+
+    inline constexpr auto operator=(char const* c_str) noexcept {
+        this->data.assign(c_str, c_str + (usize) std::strlen(c_str));
     }
 
-    /// @brief Length of the string excluding the tailing `NULL`.
-    /// @return the length
-    /// 
+    inline constexpr auto operator=(str s) noexcept {
+        this->data.assign(s.head, s.tail());
+    }
+
     inline constexpr auto len() const noexcept -> usize {
-        return this->length;
-    }
-
-    /// @brief Construct from a c-style string. This automatically calculates `c_str`'s length and clones it.
-    /// @param c_str a c-style string
-    /// 
-    inline String(char const* c_str) noexcept {
-        this->length = ::std::strlen(c_str);
-        this->cap = this->len() + 1;
-        this->head = (char*) ::std::malloc(this->cap);
-        ::std::memcpy(this->head, c_str, this->length);
-    }
-
-    /// @brief Move constructor.
-    /// @param s a moved `String`
-    /// 
-    inline String(String const&& s) noexcept {
-        this->head = s.head;
-        this->length = s.length;
-        this->cap = s.cap;
-
-        // To avoid double free. I am not sure if this is a best practice.
-        // Theoratically, this is safe, since `s` is moved and never accessed again.
-        auto x = (char**) (usize) &s.head;
-        *x = nullptr;
+        return this->data.size();
     }
 
     inline constexpr auto operator*() const noexcept -> str {
-        return str(this->head, this->len());
+        return str(this->data.data(), this->data.size());
     }
 
     inline constexpr operator str() const noexcept {
-        return str(this->head, this->len());
+        return **this;
     }
 
-    /// @brief Reference by a raw c-style string.
-    /// @return the pointer to head of string
-    /// 
-    inline constexpr auto operator&() const noexcept -> char const* {
-        return this->head;
+    inline constexpr auto operator&() const noexcept -> std::string_view {
+        return &**this;
     }
 
-    /// @brief Reduce current allocated size to the minimum possible.
-    /// @return self
+    /// @brief Index the string.
+    /// @param idx the index
+    /// @return the `idx`th char
     /// 
-    inline auto minimize() noexcept -> String& {
-        if (this->cap > this->len() * 2 + 1) this->realloc(this->len() + 1);
-        return *this;
+    /// # Panic
+    /// 
+    /// Panic if the index is out of bound.
+    /// 
+    inline constexpr auto operator[](usize idx) const noexcept -> char const& {
+        if (idx > this->data.size()) coding::panic("index out of bound");
+        return this->data[idx];
     }
 
-    /// @brief Clear the current content, making the instance an empty string.
-    /// @return self
+    /// @brief Index the string.
+    /// @param idx the index
+    /// @return the `idx`th char
     /// 
-    inline auto clear() noexcept -> String& {
-        this->realloc(1);
-        return *this;
+    /// # Panic
+    /// 
+    /// Panic if the index is out of bound.
+    /// 
+    inline constexpr auto operator[](usize idx) noexcept -> char& {
+        if (idx > this->data.size()) coding::panic("index out of bound");
+        return this->data[idx];
     }
 
-    /// @brief Prepare `buf_size` bytes allocated space for appending.
-    /// @param buf_size the number of bytes
-    /// @return self
+    /// @brief Same as `.operator[]` but does not perform boundary check.
+    /// @param idx the index
+    /// @return the `idx`th char
     /// 
-    inline auto buf(usize buf_size) noexcept -> String& {
-        auto a = this->len() + buf_size + 1;
-        if (this->cap <= a) this->realloc(a);
-        return *this;
+    inline constexpr auto index_unchecked(usize idx) const noexcept -> char const& {
+        return this->data[idx];
     }
 
-    /// @brief Append a `str` to the tail of the current string.
-    /// @param s the content to append
-    /// @return self
-    /// 
-    inline auto append(str s) noexcept -> String& {
-        this->buf(s.len);
-        ::std::memcpy(this->tail(), s.head, s.len);
-        this->length += s.len;
-        return *this;
+    inline constexpr auto operator+=(String const& rhs) noexcept {
+        this->data.insert(this->data.end(), rhs.data.begin(), rhs.data.end());
+    }
+
+    inline constexpr auto operator+(String const& rhs) noexcept {
+        auto ans = rhs;
+        ans += rhs;
+        return ans;
     }
 
 };
+
+inline constexpr auto operator"" _str(char const* s, usize len) noexcept -> str { return str(s, len); };

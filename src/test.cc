@@ -1,7 +1,6 @@
-#include "str.cc"
+#include "log.cc"
 
-auto main(int argc, char const* const* argv) -> int {
-    str a = argv[1];
-    for (auto i : a.split(argv[2])) std::cout << "'" << &i << "'" << std::endl;
+auto main() -> int {
+    coding::log::LOG_LEVEL = coding::log::LOG_LEVEL_ERROR;
     return 0;
 }

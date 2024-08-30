@@ -5,7 +5,7 @@
 
 #include "collections.cc"
 #include "hash.cc"
-#include "mem.cc"
+#include "log.cc"
 #include "ops.cc"
 #include "option.cc"
 #include "ptr.cc"

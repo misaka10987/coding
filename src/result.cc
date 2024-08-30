@@ -34,12 +34,14 @@ namespace coding {
     /// @tparam E the error type
     /// 
     template<typename T, typename E>
-    class Result final{
+    class Result final {
     private:
 
         union Inner {
             T Ok;
             E Err;
+            unit _;
+            Inner() :_(unit()) {}
             ~Inner() {}
         };
 
@@ -49,7 +51,18 @@ namespace coding {
 
     public:
 
-        inline constexpr Result(result::Tag tag, Inner value) noexcept : tag(tag), value(value) {}
+        inline constexpr Result(result::Tag tag) noexcept : tag(tag) {}
+
+        inline constexpr Result(Result const& other) noexcept : tag(other.tag) {
+            switch (other.tag) {
+            case Ok: {
+                this->value.Ok = other.value.Ok;
+            }
+            case Err: {
+                this->value.Err = other.value.Err;
+            }
+            }
+        }
 
         ~Result() {
             switch (*this) {
@@ -69,15 +82,9 @@ namespace coding {
         /// @return new `Result`
         /// 
         static inline constexpr auto ok(T const& value) noexcept -> Result {
-            return Result(Ok, { .Ok = value });
-        }
-
-        /// @brief Construct an `Ok` value
-        /// @param value the value with
-        /// @return new `Result`
-        /// 
-        static inline constexpr auto ok(T const&& value) noexcept -> Result {
-            return Result(Ok, { .Ok = mv(value) });
+            auto res = Result(Ok);
+            res.value.Ok = value;
+            return res;
         }
 
         /// @brief Construct an `Err` value
@@ -85,15 +92,9 @@ namespace coding {
         /// @return new `Result`
         /// 
         static inline constexpr auto err(E const& value) noexcept -> Result {
-            return Result(Err, { .Err = value });
-        }
-
-        /// @brief Construct an `Err` value
-        /// @param value the value with
-        /// @return new `Result`
-        /// 
-        static inline constexpr auto err(E const&& value) noexcept -> Result {
-            return Result(Err, { .Err = mv(value) });
+            auto res = Result(Err);
+            res.value = Err = value;
+            return res;
         }
 
         /// @brief Implicitly cast to `Tag`.
