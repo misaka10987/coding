@@ -64,21 +64,6 @@ inline constexpr auto operator"" u64(unsigned long long x) noexcept -> u64 { ret
 #define u32 u32
 #define u64 u64
 
-
-#ifdef __GNUC__
-typedef __int128_t i128;
-typedef __uint128_t u128;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wliteral-suffix"
-inline constexpr auto operator"" i128(unsigned long long x) noexcept -> i128 { return (i128) x; };
-inline constexpr auto operator"" u128(unsigned long long x) noexcept -> u128 { return (u128) x; };
-#pragma GCC diagnostic pop
-
-#define i128 i128
-#define u128 u128
-#endif
-
 /// @brief Move the ownership of a certain variable.
 /// 
 #define mv mv
