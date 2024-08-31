@@ -6,6 +6,7 @@
 #include "collections.cc"
 #include "hash.cc"
 #include "log.cc"
+#include "measure.cc"
 #include "ops.cc"
 #include "option.cc"
 #include "ptr.cc"
@@ -27,9 +28,9 @@ inline constexpr auto operator*(T& x) noexcept -> T& {
 
 namespace coding {
 
-    template <typename T> using Vec = ::std::vector<T>;
+    template <typename T> using Vec = std::vector<T>;
 
     template<typename T> auto println(T const& v) {
-        ::std::cout << v << ::std::endl;
+        std::cout << v << std::endl;
     }
 }
