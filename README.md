@@ -6,5 +6,5 @@ git submodule add https://github.com/misaka10987/coding.git ${install-path}
 ```
 # Usage
 ```c++
-#include "${install-path}/coding.cc"
+#include "${install-path}/lib.cc"
 ```
