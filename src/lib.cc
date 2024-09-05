@@ -5,6 +5,7 @@
 
 #include "collections.cc"
 #include "hash.cc"
+#include "lazy.cc"
 #include "log.cc"
 #include "measure.cc"
 #include "ops.cc"
