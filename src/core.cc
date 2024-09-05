@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <utility>
-#include <functional>
 
 #define unit unit
 
@@ -38,16 +37,16 @@ typedef ::std::uint64_t u64;
 #pragma GCC diagnostic ignored "-Wliteral-suffix"
 #endif
 
-inline constexpr auto operator"" usize(unsigned long long x) noexcept -> usize { return (usize) x; };
-inline constexpr auto operator"" isize(unsigned long long x) noexcept -> isize { return (isize) x; };
-inline constexpr auto operator"" i8(unsigned long long x) noexcept -> i8 { return (i8) x; };
-inline constexpr auto operator"" i16(unsigned long long x) noexcept -> i16 { return (i16) x; };
-inline constexpr auto operator"" i32(unsigned long long x) noexcept -> i32 { return (i32) x; };
-inline constexpr auto operator"" i64(unsigned long long x) noexcept -> i64 { return (i64) x; };
-inline constexpr auto operator"" u8(unsigned long long x) noexcept -> u8 { return (u8) x; };
-inline constexpr auto operator"" u16(unsigned long long x) noexcept -> u16 { return (u16) x; };
-inline constexpr auto operator"" u32(unsigned long long x) noexcept -> u32 { return (u32) x; };
-inline constexpr auto operator"" u64(unsigned long long x) noexcept -> u64 { return (u64) x; };
+inline constexpr auto operator"" usize(unsigned long long x) noexcept -> usize { return (usize)x; };
+inline constexpr auto operator"" isize(unsigned long long x) noexcept -> isize { return (isize)x; };
+inline constexpr auto operator"" i8(unsigned long long x) noexcept -> i8 { return (i8)x; };
+inline constexpr auto operator"" i16(unsigned long long x) noexcept -> i16 { return (i16)x; };
+inline constexpr auto operator"" i32(unsigned long long x) noexcept -> i32 { return (i32)x; };
+inline constexpr auto operator"" i64(unsigned long long x) noexcept -> i64 { return (i64)x; };
+inline constexpr auto operator"" u8(unsigned long long x) noexcept -> u8 { return (u8)x; };
+inline constexpr auto operator"" u16(unsigned long long x) noexcept -> u16 { return (u16)x; };
+inline constexpr auto operator"" u32(unsigned long long x) noexcept -> u32 { return (u32)x; };
+inline constexpr auto operator"" u64(unsigned long long x) noexcept -> u64 { return (u64)x; };
 
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
@@ -63,6 +62,12 @@ inline constexpr auto operator"" u64(unsigned long long x) noexcept -> u64 { ret
 #define u16 u16
 #define u32 u32
 #define u64 u64
+
+typedef float f32;
+typedef double f64;
+
+#define f32 f32
+#define f64 f64
 
 /// @brief Move the ownership of a certain variable.
 /// 
@@ -82,4 +87,12 @@ template<typename T> inline constexpr auto mv(T&& src) noexcept -> typename ::st
 /// 
 #define loop for (;;)
 
-#define Fn(signature) ::std::function<signature>
+/// @brief Require a type to implement function from `T...` to `U`.
+/// @tparam Self the type itself
+/// @tparam U the return type
+/// @tparam T... the argument type
+/// 
+template<typename Self, typename U, typename... T>
+concept Fn = requires(Self a, T... arg) {
+    { a(arg...) } -> std::same_as<U>;
+};

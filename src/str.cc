@@ -2,6 +2,7 @@
 
 #include "root.cc"
 #include "core.cc"
+
 #include "thread.cc"
 
 #include <cstring>
@@ -154,6 +155,7 @@ public:
             std::string_view pat;
 
             usize next = 0;
+
         public:
 
             inline constexpr Iterator(std::string_view s, std::string_view pat) noexcept : s(s), pat(pat) {}
@@ -228,12 +230,12 @@ namespace coding {
 
     public:
 
-        inline constexpr String(char const* c_str) noexcept :data(std::vector(c_str, c_str + (usize) std::strlen(c_str))) {}
+        inline constexpr String(char const* c_str) noexcept :data(std::vector(c_str, c_str + (usize)std::strlen(c_str))) {}
 
         inline constexpr String(str s) noexcept :data(std::vector(s.head, s.tail())) {}
 
         inline constexpr auto operator=(char const* c_str) noexcept {
-            this->data.assign(c_str, c_str + (usize) std::strlen(c_str));
+            this->data.assign(c_str, c_str + (usize)std::strlen(c_str));
         }
 
         inline constexpr auto operator=(str s) noexcept {
@@ -301,6 +303,7 @@ namespace coding {
         }
 
     };
+
 }
 
 inline constexpr auto operator"" _str(char const* s, usize len) noexcept -> str { return str(s, len); };

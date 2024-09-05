@@ -3,6 +3,8 @@
 #include "root.cc"
 #include "core.cc"
 
+#include <functional>
+
 namespace coding {
 
     /// @brief A lazy-evaluation smart pointer.
@@ -19,11 +21,11 @@ namespace coding {
 
         /// @brief The calculation that is lazy evaluated.
         /// 
-        Fn(T(void)) provider;
+        std::function(T(void)) provider;
 
     public:
 
-        inline constexpr Lazy(Fn(T(void)) calc) noexcept : provider(calc) {}
+        inline constexpr Lazy(std::function(T(void)) calc) noexcept : provider(calc) {}
 
         inline constexpr Lazy(Lazy const& other) noexcept : provider(other.provider) {
             if (other.maybe_uninit) this->maybe_uninit = new T(*other.maybe_uninit);

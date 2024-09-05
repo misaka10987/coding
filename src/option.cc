@@ -110,11 +110,12 @@ namespace coding {
 
         /// @brief Maps the `Some` value if it is, otherwise return a `None`.
         /// @tparam U the type mapped to
+        /// @tparam F the type of which the function has
         /// @param mapping the mapping function to call
         /// @return the mapped new `Option`
         /// 
-        template<typename U>
-        inline constexpr auto map(Fn(U(T const&)) mapping) const& noexcept -> Option<U> {
+        template<typename U, Fn<U, T const&> F>
+        inline constexpr auto map(F mapping) const& noexcept -> Option<U> {
             if (this->is_none()) return Option();
             auto some = mapping(std::get<T>(this->value));
             return Option(some);

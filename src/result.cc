@@ -189,11 +189,12 @@ namespace coding::result {
 
         /// @brief Maps the `Ok` value if it is, otherwise return the same `Err` value.
         /// @tparam U the type mapped to
+        /// @tparam F the type of which the function has
         /// @param mapping the mapping function to call
         /// @return the mapped new `Result`
         /// 
-        template<typename U>
-        inline constexpr auto map(Fn(U(T const&)) mapping) const& noexcept -> Result<U, E> {
+        template<typename U, Fn<U, T const&> F>
+        inline constexpr auto map(F mapping) const& noexcept -> Result<U, E> {
             if (this->is_err()) return Result<U, E>::err(std::get<Error<E>>(this->value));
             auto ok = mapping(std::get<T>(this->value));
             return Result<U, E>::ok(ok);
@@ -201,11 +202,12 @@ namespace coding::result {
 
         /// @brief Maps the `Err` value if it is, otherwise return the same `Ok` value.
         /// @tparam U the type mapped to
+        /// @tparam F the type of which the function has
         /// @param mapping the mapping function to call
         /// @return the mapped new `Result`
         /// 
-        template<typename U>
-        inline constexpr auto map_err(Fn(U(T const&)) mapping) const& noexcept -> Result<T, U> {
+        template<typename U, Fn<U, T const&> F>
+        inline constexpr auto map_err(F mapping) const& noexcept -> Result<T, U> {
             if (this->is_ok()) return Result<T, U>::ok(std::get<T>(this->value));
             auto err = mapping(std::get<Error<E>>(this->value));
             return Result<T, U>::err(err);
